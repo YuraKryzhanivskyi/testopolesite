@@ -1,24 +1,86 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <title>Випадкова фраза</title>
+  <title>Випадкові фрази</title>
   <style>
     body {
+      margin: 0;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
       font-family: Arial, sans-serif;
-      font-size: 2em;
       text-align: center;
+      overflow: hidden;
+    }
+
+    #phrase {
+      font-size: clamp(2.5rem, 1.136rem + 6.82vw, 6.25rem);
+      font-weight: bold;
+      color: white;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+      z-index: 2;
+    }
+
+    /* Прелоудер */
+    #preloader {
+      display: flex;
+      gap: 0.3em;
+      font-size: 1.5em;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .emoji {
+	
+      display: inline-block;
+      animation: bounce 1.2s infinite;
+    }
+
+    .emoji:nth-child(2) { animation-delay: 0.2s; }
+    .emoji:nth-child(3) { animation-delay: 0.4s; }
+    .emoji:nth-child(4) { animation-delay: 0.6s; }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
   </style>
 </head>
 <body>
-  <div id="phrase">Завантаження...</div>
+  <div id="phrase">
+    <div id="preloader">
+      <span class="emoji">💅</span>
+      <span class="emoji">🎨</span>
+      <span class="emoji">🌸</span>
+      <span class="emoji">✨</span>
+    </div>
+  </div>
 
   <script>
+    // Функція випадкового градієнта
+    function setRandomGradient() {
+      const colors = [
+        ["#ff9a9e", "#fad0c4"],
+        ["#a18cd1", "#fbc2eb"],
+        ["#f6d365", "#fda085"],
+        ["#84fab0", "#8fd3f4"],
+        ["#fccb90", "#d57eeb"],
+        ["#cfd9df", "#e2ebf0"],
+        ["#ffecd2", "#fcb69f"]
+      ];
+      const pair = colors[Math.floor(Math.random() * colors.length)];
+      document.body.style.background = `linear-gradient(135deg, ${pair[0]}, ${pair[1]})`;
+    }
+
+    setRandomGradient();
+
+    // Завантаження фрази
     fetch("https://script.google.com/macros/s/AKfycbyBb2hvA5I5x8cLBgfEDL2bQbHVFytEfrs_Cb06LjUFvbT5jKHjgRmMdSxJ4oNc2cwKvQ/exec")
       .then(r => r.text())
       .then(text => {
