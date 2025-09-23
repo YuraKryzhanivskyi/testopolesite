@@ -3,47 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <title>Випадкова фраза</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      overflow: hidden; /* забирає скрол */
-    }
-
     body {
       display: flex;
       justify-content: center;
       align-items: center;
+      height: 100vh;
       font-family: Arial, sans-serif;
+      font-size: 2em;
       text-align: center;
-      transition: background 1s ease;
-      padding: 20px;
-    }
-
-    #phrase {
-      font-size: 8vw; /* мобільний first — залежить від ширини екрана */
-      font-weight: bold;
-      line-height: 1.2;
-      background: linear-gradient(45deg, #ff6a00, #ee0979);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      max-width: 90%;
-      word-wrap: break-word;
-    }
-
-    /* Трохи менший шрифт на великих екранах */
-    @media (min-width: 768px) {
-      #phrase {
-        font-size: 5vw;
-      }
-    }
-
-    @media (min-width: 1200px) {
-      #phrase {
-        font-size: 3vw;
-      }
     }
   </style>
 </head>
@@ -51,28 +19,7 @@
   <div id="phrase">Завантаження...</div>
 
   <script>
-    const count = 10; // кількість фраз у таблиці
-    const randomIndex = Math.floor(Math.random() * count);
-
-    // Випадкові градієнти для фону
-    const gradients = [
-      "linear-gradient(135deg, #ff9a9e, #fad0c4)",
-      "linear-gradient(135deg, #a18cd1, #fbc2eb)",
-      "linear-gradient(135deg, #84fab0, #8fd3f4)",
-      "linear-gradient(135deg, #ffecd2, #fcb69f)",
-      "linear-gradient(135deg, #f6d365, #fda085)",
-      "linear-gradient(135deg, #cfd9df, #e2ebf0)",
-      "linear-gradient(135deg, #f093fb, #f5576c)",
-      "linear-gradient(135deg, #4facfe, #00f2fe)",
-      "linear-gradient(135deg, #43e97b, #38f9d7)",
-      "linear-gradient(135deg, #fa709a, #fee140)"
-    ];
-
-    // Випадковий фон
-    document.body.style.background = gradients[Math.floor(Math.random() * gradients.length)];
-
-    // Завантаження фрази по індексу
-    fetch(`https://script.google.com/macros/s/AKfycbxzUVbqO9xqkph27_-BM5AJE-sMj0cXy4Dvh7DpbjupfinBWJLXhaw6H5-S-wrpC6E-xQ/exec=${randomIndex}`)
+    fetch("https://script.google.com/macros/s/AKfycbyBb2hvA5I5x8cLBgfEDL2bQbHVFytEfrs_Cb06LjUFvbT5jKHjgRmMdSxJ4oNc2cwKvQ/exec")
       .then(r => r.text())
       .then(text => {
         document.getElementById("phrase").textContent = text;
