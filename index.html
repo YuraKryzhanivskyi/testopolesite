@@ -1,94 +1,189 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Випадкові фрази</title>
+  <title>Daily G Quote</title>
+
   <style>
-    body {
+    /* ===== Локальний шрифт для цитати ===== */
+    @font-face {
+      font-family: 'NowLight';
+      src: url('fonts/now.light.otf') format('opentype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    body, html {
       margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      font-family: Arial, sans-serif;
-      text-align: center;
+      padding: 0;
+      height: 100%;
       overflow: hidden;
+      font-family: sans-serif;
     }
 
-    #phrase {
-      font-size: clamp(2.5rem, 1.136rem + 6.82vw, 6.25rem);
-      font-weight: bold;
-      color: white;
-      text-shadow: 0 2px 5px rgba(0,0,0,0.5);
-      z-index: 2;
+    /* ===== ФОН ===== */
+    .background {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-size: cover;
+      background-position: center;
+      transition: filter 1s ease;
     }
 
-    /* Прелоудер */
-    #preloader {
+    /* ===== ЛОГО "daily G quote" ===== */
+    .logo {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       display: flex;
-      gap: 0.3em;
-      font-size: 1.5em;
-      animation: fadeIn 0.3s ease-in-out;
+      gap: 0.5em;
+      font-size: 3rem;
+      font-weight: bold;
     }
 
-    .emoji {
-	
-      display: inline-block;
-      animation: bounce 1.2s infinite;
+    .logo span {
+      opacity: 0;
+      transform: translateY(50px);
+      animation: slideUp 1s forwards;
     }
 
-    .emoji:nth-child(2) { animation-delay: 0.2s; }
-    .emoji:nth-child(3) { animation-delay: 0.4s; }
-    .emoji:nth-child(4) { animation-delay: 0.6s; }
+    .logo span:nth-child(1) { animation-delay: 0s; }
+    .logo span:nth-child(2) { animation-delay: 0.3s; }
+    .logo span:nth-child(3) { animation-delay: 0.6s; }
 
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+    @keyframes slideUp {
+      0%   { opacity: 0; transform: translateY(50px) scale(0.8); }
+      60%  { opacity: 1; transform: translateY(-10px) scale(1.05); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    .hidden {
+      opacity: 0 !important;
+      transition: opacity 1s ease;
+    }
+
+    .blurred {
+      filter: blur(6px);
+    }
+
+    /* ===== ПЛАШКА ЦИТАТИ ===== */
+    .quote-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      opacity: 0;
+      display: inline-block; /* висота залежить від тексту */
+      text-align: center;
+      width: 90%;
+      max-width: 800px;
+      transition: all 1s ease;
+      padding: 100px 3rem 160px 3rem; /* зверху 100px, знизу 160px для лого */
+      box-sizing: border-box;
+    }
+
+    .quote-container.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .quote-bg {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%; /* покриває весь блок */
+      object-fit: cover; /* фон підлаштовується */
+      z-index: 1;
+    }
+
+    .quote-text {
+      position: relative;
+      z-index: 2;
+      font-size: 48px;
+      color: #424242;
+      font-family: 'NowLight', sans-serif;
+
+      /* обмеження тексту всередині плашки з запасом */
+      max-width: 80%;      /* трохи менше ширини плашки для запасу */
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      box-sizing: border-box;
+      margin: 0 auto;       /* центрування тексту */
+    }
+
+    /* ===== ЛОГО ВНИЗУ ПЛАШКИ ===== */
+    .quote-logo-bottom {
+      position: absolute;
+      bottom: 20px; /* відступ від низу плашки */
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      width: 120px; /* ширина маленького логотипу */
+      height: auto;
     }
   </style>
 </head>
 <body>
-  <div id="phrase">
-    <div id="preloader">
-      <span class="emoji">💅</span>
-      <span class="emoji">🎨</span>
-      <span class="emoji">🌸</span>
-      <span class="emoji">✨</span>
-    </div>
+
+  <!-- Випадковий ФОН -->
+  <div class="background" id="bg"></div>
+
+  <!-- ЛОГО стартового екрану -->
+  <div class="logo" id="logo">
+    <span>daily</span>
+    <span>G</span>
+    <span>quote</span>
+  </div>
+
+  <!-- ПЛАШКА ЦИТАТИ -->
+  <div class="quote-container" id="quoteBox">
+    <img src="img/paper.png" alt="Paper background" class="quote-bg">
+    <div class="quote-text" id="quoteText"></div>
+    <img src="img/logo_s.png" alt="logo small" class="quote-logo-bottom">
   </div>
 
   <script>
-    // Функція випадкового градієнта
-    function setRandomGradient() {
-      const colors = [
-        ["#ff9a9e", "#fad0c4"],
-        ["#a18cd1", "#fbc2eb"],
-        ["#f6d365", "#fda085"],
-        ["#84fab0", "#8fd3f4"],
-        ["#fccb90", "#d57eeb"],
-        ["#cfd9df", "#e2ebf0"],
-        ["#ffecd2", "#fcb69f"]
-      ];
-      const pair = colors[Math.floor(Math.random() * colors.length)];
-      document.body.style.background = `linear-gradient(135deg, ${pair[0]}, ${pair[1]})`;
-    }
+    // 🔹 Масиви фонів та кольорів для лого
+    const backgrounds = [
+      "img/bg1.jpg", "img/bg2.jpg", "img/bg3.jpg",
+      "img/bg4.jpg", "img/bg5.jpg", "img/bg6.jpg",
+      "img/bg7.jpg", "img/bg8.jpg", "img/bg9.jpg"
+    ];
 
-    setRandomGradient();
+    const logoColors = [
+      "#FFFF00", "#FFFFFF", "#FF9900", "#8A2BE2", "#FFFFFF",
+      "#FF4F00", "#0000FF", "#FFFFFF", "#FFFFFF"
+    ];
 
-    // Завантаження фрази
+    const bg = document.getElementById("bg");
+    const logo = document.getElementById("logo");
+    const quoteBox = document.getElementById("quoteBox");
+    const quoteText = document.getElementById("quoteText");
+
+    // 🔹 Випадковий фон
+    const index = Math.floor(Math.random() * backgrounds.length);
+    bg.style.backgroundImage = `url(${backgrounds[index]})`;
+    logo.style.color = logoColors[index];
+
+    // 🔹 Завантаження цитати
     fetch("https://script.google.com/macros/s/AKfycbyBb2hvA5I5x8cLBgfEDL2bQbHVFytEfrs_Cb06LjUFvbT5jKHjgRmMdSxJ4oNc2cwKvQ/exec")
-      .then(r => r.text())
+      .then(res => res.text())
       .then(text => {
-        document.getElementById("phrase").textContent = text;
-      })
-      .catch(() => {
-        document.getElementById("phrase").textContent = "Помилка завантаження";
+        // Вставляємо текст
+        quoteText.innerText = text;
+
+        // Ховаємо лого стартового екрану, зупиняємо анімацію, блюримо фон
+        logo.classList.add("hidden");
+        bg.classList.add("blurred");
+
+        // Показуємо плашку цитати
+        setTimeout(() => {
+          quoteBox.classList.add("show");
+        }, 800);
       });
   </script>
+
 </body>
 </html>
